@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+  "name": "Safe (2020) Travels",
+  "version": "0.5",
+  "content_scripts": [
+    {
+      "matches": ["*://*.airbnb.com/rooms/*"],
+      "js": ["safety.js"],
+      "css": ["safety.css"],
+      "run_at": "document_end"
+    }
+  ]
+}

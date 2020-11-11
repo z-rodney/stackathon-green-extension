@@ -1,0 +1,16 @@
+{
+  "name": "green-extension",
+  "version": "1.0.0",
+  "description": "",
+  "main": "safety.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "web-ext": "^5.3.0"
+  }
+}
