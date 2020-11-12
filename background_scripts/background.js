@@ -1,10 +1,10 @@
-const handleMessage = (request, sender, sendResponse) => {
+/*const handleMessage = (request, sender, sendResponse) => {
   console.log('received msg in bg')
-  /*if (request.command === 'get location data') {
+  if (request.command === 'get location data') {
     sendResponse({
       response: `Received request to ${request.command}`
     })
-  }*/
+  }
   const messageDetails = {
     request: request,
     sender: sender,
@@ -17,4 +17,4 @@ const handleMessage = (request, sender, sendResponse) => {
 
 browser.runtime.onMessage.addListener(handleMessage)
 
-console.log('bg script: logged')
+console.log('bg script: logged')*/
