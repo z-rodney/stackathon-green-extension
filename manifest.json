@@ -4,10 +4,18 @@
   "version": "0.5",
   "content_scripts": [
     {
-      "matches": ["*://*.airbnb.com/rooms/*"],
-      "js": ["safety.js"],
-      "css": ["safety.css"],
-      "run_at": "document_end"
+      "matches": ["*://*.mozilla.org/*"],
+      "js": ["firefoxTest.js"]
     }
-  ]
+  ],
+  "permissions": [
+    "activeTab"
+  ],
+  "page_action": {
+    "browser_style": true,
+    "default_popup": "popup/safety.html",
+    "default_title": "Get COVID Safety information",
+    "show_matches": ["*://*.airbnb.com/rooms/*"],
+    "default_icon": "popup/img/virus-solid.svg"
+  }
 }
