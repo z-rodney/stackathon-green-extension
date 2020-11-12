@@ -4,6 +4,11 @@
   "version": "0.5",
   "content_scripts": [
     {
+      "matches": ["*://*.airbnb.com/rooms/*"],
+      "js": ["content_scripts/getData.js"],
+      "run_at": "document_end"
+    },
+    {
       "matches": ["*://*.mozilla.org/*"],
       "js": ["firefoxTest.js"]
     }
@@ -17,5 +22,8 @@
     "default_title": "Get COVID Safety information",
     "show_matches": ["*://*.airbnb.com/rooms/*"],
     "default_icon": "popup/img/virus-solid.svg"
+  },
+  "background": {
+    "scripts": ["background_scripts/background.js"]
   }
 }
