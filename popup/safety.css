@@ -2,3 +2,28 @@ html {
   margin: 2px;
   padding: 2px;
 }
+
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+.risk-0 {
+  color: green;
+}
+
+.risk-1 {
+  color: rgb(255, 217, 0);
+}
+
+.risk-2 {
+  color: rgb(207, 135, 0);
+}
+
+.risk-3 {
+  color: red;
+}
+
+.risk-4 {
+  color: gray;
+}
