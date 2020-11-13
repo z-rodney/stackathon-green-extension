@@ -1,15 +1,13 @@
-
-
-const form = document.querySelector('form');
+//const form = document.querySelector('form');
 const mainBody = document.querySelector('#root')
-const mainInput = document.querySelector('#main-input')
+//const mainInput = document.querySelector('#main-input')
 
 const hideElement = (element) => {
   element.className = 'hidden'
 }
 
 function DataError(message, details) {
-  this.message = message;
+  this.message = message
   this.details = details
 }
 
@@ -94,7 +92,7 @@ const overallRisk = (num) => {
 
 const generateData = (covidData) => {
   const { dataLocation: { state, county }, asOf, overall, caseDensity, infectionRate, testPositivityRatio} = covidData
-  const mainDiv = document.createElement('div');
+  const mainDiv = document.createElement('div')
   const heading1 = document.createElement('h2')
   const heading2 = document.createElement('h3')
   const dateInfo = document.createElement('p')
@@ -106,24 +104,35 @@ const generateData = (covidData) => {
   heading2.innerText = `${overallRisk(overall)} Risk in ${county}, ${state}`
   heading2.className = `risk-${overall}`
   dateInfo.innerText = `as of ${new Date(asOf).toDateString()}`
-  bullet1.innerText = `${Math.ceil(caseDensity.metric)} cases per 100,000 people`
+  bullet1.innerText = `${Math.ceil(caseDensity.metric) || 'Unknown'} cases per 100,000 people`
   bullet1.className = `risk-${caseDensity.risk}`
-  bullet2.innerText = `Each case generates ${infectionRate.metric.toFixed(2)} cases, on average`
+  bullet2.innerText = `Each case generates ${infectionRate.metric ? infectionRate.metric.toFixed(2) : 'Unknown'} cases, on average`
   bullet2.className = `risk-${infectionRate.risk}`
-  bullet3.innerText = `${testPositivityRatio.metric * 100}% test positivity rate`
+  bullet3.innerText = `${testPositivityRatio.metric ? (testPositivityRatio.metric * 100).toFixed(2) : 'Unknown'}% test positivity rate`
   bullet3.className = `risk-${testPositivityRatio.risk}`
   listWrapper.append(bullet1, bullet2, bullet3)
-  mainDiv.append(heading1, heading2, dateInfo)
+  mainDiv.append(heading1, heading2, dateInfo, listWrapper)
   return mainDiv
 }
 
 const generateErrorMessage = (error) => {
-
+  const errorDiv = document.createElement('div')
+  const errMessage = document.createElement('h2')
+  const errDetail = document.createElement('p')
+  errMessage.innerText = 'Uh-oh'
+  errDetail.innerText = error.message
+  errorDiv.append(errMessage, errDetail)
+  return errorDiv
 }
+
+const detailLink = document.createElement('a')
+detailLink.innerText = 'Get more details'
+detailLink.setAttribute('href', 'https://www.covidactnow.org/?s=1314325')
 
 const handleSubmit = async (ev) => {
   ev.preventDefault()
   const searchCity = document.querySelector('#search-location').value
+  let resultMessage
   try {
     const coordinates = await getLatLon(searchCity)
     const fipsCode = await getFIPSCode(coordinates)
@@ -131,49 +140,61 @@ const handleSubmit = async (ev) => {
     console.log(coordinates)
     console.log(fipsCode)
     console.log(covidData)
-    hideElement(mainInput)
-    const riskMessage = generateData(covidData)
-    mainBody.appendChild(riskMessage)
+    resultMessage = generateData(covidData)
   } catch (err) {
     console.log(err)
+    resultMessage = generateErrorMessage(err)
   }
+  //hideElement(mainInput)
+  mainBody.append(resultMessage, detailLink)
 }
 
-form.addEventListener("submit", handleSubmit)
+//form.addEventListener("submit", handleSubmit)
 
 
-
-
-
-
-
-/*const handleMessage = (request, sender, sendResponse) => {
+/*const handleMessage = async (request, sender, sendResponse) => {
+  console.log('request pu:', request)
+  console.log('sender pu:', sender)
   console.log('received msg in popup')
-  if (request.command === 'get location data') {
+  if (request.action === 'send data') {
+    let resultMessage
+    const { data } = request
+    if (data.overall) {
+      resultMessage = generateData(data)
+    } else {
+      resultMessage = generateErrorMessage(data)
+    }
+    mainBody.append(resultMessage, detailLink)
     sendResponse({
       response: `Received request to ${request.command}`
     })
   }
-  const messageDetails = {
-    request: request,
-    sender: sender,
-  }
-  console.log(messageDetails)
-  sendResponse({
-    response: 'received'
+}*/
+
+const handleRes = (message) => {
+  console.log(message)
+}
+
+handleErr = (err) => {
+  console.log('err', err)
+}
+
+const init = async () => {
+  const response = await browser.runtime.sendMessage({
+    action: 'data request'
   })
-}
-
-
-const getLocationData = async () => {
-  const dataRequest = await browser.tabs.sendMessage(
-    {
-      command: 'get location data'
+  console.log(response)
+  let resultMessage
+  if (response.overall) {
+      resultMessage = generateData(response)
+    } else {
+      resultMessage = generateErrorMessage(response)
     }
-  )
-  console.log(dataRequest)
+    mainBody.append(resultMessage, detailLink)
 }
 
-browser.runtime.onMessage.addListener(handleMessage)
-console.log('popup script: logged')*/
+init()
+
+
+//browser.runtime.onMessage.addListener(handleMessage)
 
