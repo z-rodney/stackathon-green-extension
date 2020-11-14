@@ -5,17 +5,16 @@
   "content_scripts": [
     {
       "matches": ["*://*.airbnb.com/rooms/*"],
-      "js": ["content_scripts/getData.js"],
+      "js": ["content_scripts/contentScript.js"],
       "run_at": "document_end"
     }
   ],
   "permissions": [
-    "activeTab",
-    "tabs"
+    "activeTab"
   ],
   "page_action": {
     "browser_style": true,
-    "default_title": "Get COVID Safety information",
+    "default_title": "Get COVID Risk Levels",
     "show_matches": ["*://*.airbnb.com/rooms/*"],
     "default_popup": "popup/safety.html",
     "default_icon": "popup/img/virus-solid.svg"
