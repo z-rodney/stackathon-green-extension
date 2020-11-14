@@ -69,86 +69,45 @@ const getCovidData = async (fipsCode) => {
   }
 }
 
-const findCovidDataForCity = async (searchCity) => {
-  try {
-    const coordinates = await getLatLon(searchCity)
-    const fipsCode = await getFIPSCode(coordinates)
-    const covidData = await getCovidData(fipsCode)
-    return covidData
-  } catch (err) {
-    console.log(err)
-    return new DataError('Failed to get COVID data for city', err)
-  }
+const findCovidDataForCity = (searchCity) => {
+    return getLatLon(searchCity).then(value => {
+     return getFIPSCode(value)
+    }).then(value => {
+      return getCovidData(value)
+    }).catch(err => {
+      console.log(err)
+      return new DataError('Failed to get COVID data for city', err)
+    })
 }
 
-//let cityCovidData
-//let city
-
-
-//handleRequest function uses promises because sending a response doesnt work with async/await
+let ports = {}
 let city
-const handleRequest = (request, sender, sendResponse) => {
-  if (request.action === 'send location data') {
-    console.log(`received: ${request.action}`)
-    city = request.content.city
-  }
-  if (request.action === 'data request') {
-    console.log(`received: ${request.action}`)
-    const cityCovidData = Promise.resolve(findCovidDataForCity(city))
-    console.log('sending...', cityCovidData)
-    return Promise.resolve(cityCovidData)
-    /*const cityPromise = browser.runtime.sendMessage({
-      action: 'get city'
-    })
-    //console.log('passing to then', cityPromise)
-    cityPromise.then(value => {
-      console.log('city promise then', value)
-    })
-    sendResponse('sent')*/
-    /*const data = cityPromise.then(value => {
-      const cityCovidData = findCovidDataForCity(value)
-      console.log('covidData:', cityCovidData)
-      return cityCovidData
-    })*/
-    //console.log('returning:', data)
-    //return data
-    //console.log('sending...', dataPromise)
-    //return Promise.resolve(cityCovidData)
-  } else {
-    console.log('received:', request, sender)
-  }
+let cityCovidData
+const initConnection = (port) => {
+  if (port.name.includes('content script')) ports.csPort = port
+  if (port.name.includes('popup')) ports.popupPort = port
+  port.postMessage({ action: 'connection confirmed' })
+  ports.csPort.postMessage({action: 'get city'})
+  port.onMessage.addListener((message) => {
+    console.log(message)
+    if (message.action === 'send city') {
+      city = message.city
+      console.log('city in port', city)
+      findCovidDataForCity(city).then(value => {
+        cityCovidData = value
+      }).catch(error => {
+        cityCovidData = error
+      })
+      console.log('covid data in port', cityCovidData)
+    }
+    if (message.action === 'get covid data') {
+        ports.popupPort.postMessage({
+          action: 'send covid data',
+          cityCovidData
+        })
+      cityCovidData = {}
+    }
+  })
 }
 
-const handleMessage = async (request, sender, sendResponse) => {
-  if (request.action === 'send location data') {
-    const { content: { city }} = request
-    const tabId = sender.tab.id
-    cityCovidData = await findCovidDataForCity(city)
-    browser.pageAction.setIcon({
-      tabId,
-      path: '../popup/img/virus.png'
-    })
-    sendResponse({response: `Received request to ${request.command}`})
-  } else {
-    sendResponse({
-      response: 'Could not process message',
-      request
-    })
-  }
-}
-
-browser.runtime.onMessage.addListener(handleRequest)
-
-/*browser.pageAction.onClicked.addListener((tab) => {
-  browser.pageAction.setPopup({
-    tabId: tab.id,
-    popup: '../popup/safety.html'
-  })
-  browser.pageAction.openPopup()
-  /*browser.runtime.sendMessage({
-    action: 'send data',
-    //data: cityCovidData
-  })
-})
-
-//console.log('bg script: logged')*/
+browser.runtime.onConnect.addListener(initConnection)
