@@ -81,9 +81,12 @@ const findCovidDataForCity = async (searchCity) => {
   }
 }
 
-let cityCovidData
-let city
+//let cityCovidData
+//let city
 
+
+//handleRequest function uses promises because sending a response doesnt work with async/await
+let city
 const handleRequest = (request, sender, sendResponse) => {
   if (request.action === 'send location data') {
     console.log(`received: ${request.action}`)
@@ -91,9 +94,28 @@ const handleRequest = (request, sender, sendResponse) => {
   }
   if (request.action === 'data request') {
     console.log(`received: ${request.action}`)
-    cityCovidData = Promise.resolve(findCovidDataForCity(city))
+    const cityCovidData = Promise.resolve(findCovidDataForCity(city))
     console.log('sending...', cityCovidData)
     return Promise.resolve(cityCovidData)
+    /*const cityPromise = browser.runtime.sendMessage({
+      action: 'get city'
+    })
+    //console.log('passing to then', cityPromise)
+    cityPromise.then(value => {
+      console.log('city promise then', value)
+    })
+    sendResponse('sent')*/
+    /*const data = cityPromise.then(value => {
+      const cityCovidData = findCovidDataForCity(value)
+      console.log('covidData:', cityCovidData)
+      return cityCovidData
+    })*/
+    //console.log('returning:', data)
+    //return data
+    //console.log('sending...', dataPromise)
+    //return Promise.resolve(cityCovidData)
+  } else {
+    console.log('received:', request, sender)
   }
 }
 

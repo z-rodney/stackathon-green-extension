@@ -179,20 +179,27 @@ handleErr = (err) => {
   console.log('err', err)
 }
 
-const init = async () => {
-  const response = await browser.runtime.sendMessage({
+const init = () => {
+  const response = browser.runtime.sendMessage({
     action: 'data request'
   })
-  console.log(response)
-  let resultMessage
-  if (response.overall) {
-      resultMessage = generateData(response)
-    } else {
-      resultMessage = generateErrorMessage(response)
-    }
-    mainBody.append(resultMessage, detailLink)
+  response.then(value => {
+    console.log('in pu then', value)
+    let resultMessage
+    if (value.overall) {
+        resultMessage = generateData(value)
+      } else {
+        resultMessage = generateErrorMessage(value)
+      }
+      mainBody.append(resultMessage, detailLink)
+  })
+  //console.log(response)
 }
 
+//console.log('tabs from pu:', browser.tabs.getCurrent())
+browser.tabs.getCurrent().then(value => {
+  console.log(value)
+})
 init()
 
 

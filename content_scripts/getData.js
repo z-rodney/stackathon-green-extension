@@ -1,10 +1,13 @@
+console.log('running')
+
 /*const handleDataRequest = (request, sender, sendResponse) => {
-  if (request.command === 'get location data') {
+  if (request.action === 'get city') {
+    const roomCity = document.querySelector('._5twioja').innerText
     sendResponse({
-      response: `Received request to ${request.command}`
+      roomCity
     })
   }
-}*/
+}
 
 //browser.runTime.onMessage.addListener(handleDataRequest)
 /*(function() {
@@ -21,9 +24,35 @@
     }
   })
 })()*/
+
+/*const sendData = () => {
+  const city = document.querySelector('._5twioja').innerText;
+  browser.runtime.sendMessage({
+    action: 'send location data',
+    content: {
+      city
+    }
+    console.log('sending from cs:', city)
+  })
+}
+
+browser.runtime.sendMessage({action: 'send message on load'})
+
+sendData()
+
+console.log('ran')
+//browser.runtime.onMessage.addListener()
+
+
+
+
+
+
+window.addEventListener("click", sendData)*/
+
 let sent = false
 const sendData = () => {
-  if (!sent) {
+  //if (!sent) {
     const city = document.querySelector('._5twioja').innerText;
     browser.runtime.sendMessage({
       action: 'send location data',
@@ -31,16 +60,10 @@ const sendData = () => {
         city
       }
     })
-    sent = true
-  }
+    //sent = true
+  //}
+  //sent = false
 }
 sendData()
-
-
-
-
-
-
-//window.addEventListener("click", sendData)
 
 
